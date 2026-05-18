@@ -1,51 +1,42 @@
-output "web_vm_info" {
-  description = "Information about web VM"
+output "web_vm_ips" {
+  description = "External IP addresses of web VMs"
   value = {
-    instance_name = yandex_compute_instance.vm-1.name
-    hostname      = yandex_compute_instance.vm-1.hostname
-    external_ip   = yandex_compute_instance.vm-1.network_interface[0].nat_ip_address
-    internal_ip   = yandex_compute_instance.vm-1.network_interface[0].ip_address
-    fqdn          = yandex_compute_instance.vm-1.fqdn
-    zone          = yandex_compute_instance.vm-1.zone
-    description   = yandex_compute_instance.vm-1.description
-    labels        = yandex_compute_instance.vm-1.labels
+    for i, vm in yandex_compute_instance.web :
+    vm.name => vm.network_interface[0].nat_ip_address
   }
 }
 
-output "db_vm_info" {
-  description = "Information about database VM"
+output "db_vm_ips" {
+  description = "External IP addresses of database VMs"
   value = {
-    instance_name = yandex_compute_instance.vm-2.name
-    hostname      = yandex_compute_instance.vm-2.hostname
-    external_ip   = yandex_compute_instance.vm-2.network_interface[0].nat_ip_address
-    internal_ip   = yandex_compute_instance.vm-2.network_interface[0].ip_address
-    fqdn          = yandex_compute_instance.vm-2.fqdn
-    zone          = yandex_compute_instance.vm-2.zone
-    description   = yandex_compute_instance.vm-2.description
-    labels        = yandex_compute_instance.vm-2.labels
+    for name, vm in yandex_compute_instance.db-vm :
+    name => vm.network_interface[0].nat_ip_address
   }
 }
 
-output "all_vms_info" {
-  description = "Information about all VMs"
+output "storage_vm_ip" {
+  description = "External IP address of storage VM"
+  value       = yandex_compute_instance.storage.network_interface[0].nat_ip_address
+}
+
+output "vms_fqdn" {
+  description = "FQDN of all created VMs"
   value = {
-    web_vm = {
-      name        = yandex_compute_instance.vm-1.name
-      hostname    = yandex_compute_instance.vm-1.hostname
-      external_ip = yandex_compute_instance.vm-1.network_interface[0].nat_ip_address
-      internal_ip = yandex_compute_instance.vm-1.network_interface[0].ip_address
-      fqdn        = yandex_compute_instance.vm-1.fqdn
-      zone        = yandex_compute_instance.vm-1.zone
-      role        = yandex_compute_instance.vm-1.labels["role"]
+    web = {
+      for vm in yandex_compute_instance.web :
+      vm.name => vm.fqdn
     }
-    db_vm = {
-      name        = yandex_compute_instance.vm-2.name
-      hostname    = yandex_compute_instance.vm-2.hostname
-      external_ip = yandex_compute_instance.vm-2.network_interface[0].nat_ip_address
-      internal_ip = yandex_compute_instance.vm-2.network_interface[0].ip_address
-      fqdn        = yandex_compute_instance.vm-2.fqdn
-      zone        = yandex_compute_instance.vm-2.zone
-      role        = yandex_compute_instance.vm-2.labels["role"]
+    db = {
+      for name, vm in yandex_compute_instance.db-vm :
+      name => vm.fqdn
+    }
+    storage = {
+      storage = yandex_compute_instance.storage.fqdn
     }
   }
+}
+
+output "inventory_file" {
+  description = "Path to generated Ansible inventory"
+  value       = local_file.ansible_inventory.filename
 }

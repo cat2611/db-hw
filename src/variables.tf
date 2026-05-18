@@ -1,40 +1,32 @@
-variable "yandex_token" {
-  description = "OAuth token for Yandex Cloud"
+###cloud vars
+variable "token" {
   type        = string
-  sensitive   = true
+  description = "OAuth-token; https://cloud.yandex.ru/docs/iam/concepts/authorization/oauth-token"
 }
 
 variable "cloud_id" {
-  description = "Yandex Cloud cloud ID"
   type        = string
+  description = "https://cloud.yandex.ru/docs/resource-manager/operations/cloud/get-id"
 }
 
 variable "folder_id" {
-  description = "Yandex Cloud folder ID"
   type        = string
+  description = "https://cloud.yandex.ru/docs/resource-manager/operations/folder/get-id"
 }
 
-variable "zone" {
-  description = "Default availability zone"
+variable "default_zone" {
   type        = string
   default     = "ru-central1-a"
+  description = "https://cloud.yandex.ru/docs/overview/concepts/geo-scope"
+}
+variable "default_cidr" {
+  type        = list(string)
+  default     = ["10.0.1.0/24"]
+  description = "https://cloud.yandex.ru/docs/vpc/operations/subnet-create"
 }
 
-
-variable "vpc_network_name" {
-  description = "VPC network name"
+variable "vpc_name" {
   type        = string
-  default     = "test-network"
-}
-
-variable "vpc_subnet_name" {
-  description = "VPC subnet base name"
-  type        = string
-  default     = "test-subnet"
-}
-
-variable "vms_ssh_public_root_key" {
-  description = "Path to SSH public key file"
-  type        = string
-  default     = "/home/lad/.ssh/id_rsa.pub"
+  default     = "develop"
+  description = "VPC network&subnet name"
 }
